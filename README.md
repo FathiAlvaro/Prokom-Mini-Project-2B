@@ -1,8 +1,6 @@
 # Prokom-Mini-Project-2B
 # Analisis Prioritas Peningkatan Pelayanan Administrasi Kependudukan Berdasarkan Kesenjangan Kepemilikan KTP-el Menggunakan Metode Pareto
 
-Mini Project Pemrograman Komputer, Kelompok 2B, Laboratorium Sistem Informasi dan Keputusan, Departemen Teknik Industri, Fakultas Teknik, Universitas Andalas, 2026.
-
 ## Daftar Isi
 
 - [Latar Belakang](#latar-belakang)
@@ -33,6 +31,7 @@ KTP-el adalah identitas resmi penduduk yang menjadi dasar untuk memperoleh berba
 
 | Fitur | Keterangan |
 |-------|-----------|
+| Login akun | Pengguna harus memasukkan username dan password (class `Akun`) |
 | Pembacaan dan validasi CSV | Memeriksa file kosong, kolom wajib, kelengkapan kolom tiap baris, dan format angka |
 | Pencatatan error dan anomali | Baris bermasalah dicatat dalam log tanpa menghentikan program |
 | Menu 1: Audit Data & Kesenjangan | Jumlah wilayah valid, total wajib KTP, total perekaman, total kesenjangan, rata-rata, median, log, dan tabel kesenjangan per wilayah |
@@ -101,18 +100,21 @@ Rata-rata dan median dihitung dengan `statistics.mean` dan `statistics.median`, 
 ## Cara Menjalankan Program
 
 1. Unduh atau clone repositori ini.
-2. Pastikan file `cakupan-ktp-el-sumut-kab-kota-2025.csv` berada satu folder dengan `mini_project_2B.py`, atau siapkan path file tersebut.
+2. Pastikan file `cakupan-ktp-el-sumut-kab-kota-2025.csv` berada satu folder dengan `mini_project_2B.py`, dan namanya persis sama. Jika nama atau lokasinya berbeda, program akan meminta path file CSV saat dijalankan.
 3. Buka terminal pada folder program, lalu jalankan:
 
    ```bash
    python mini_project_2B.py
    ```
 
-4. Jika file CSV tidak ditemukan atau isinya tidak valid, program menampilkan pesan error dan meminta path file CSV lain.
+4. Masukkan username dan password saat diminta (lihat [Panduan Penggunaan](#panduan-penggunaan)).
+5. Jika file CSV tidak ditemukan atau isinya tidak valid, program menampilkan pesan error dan meminta path file CSV lain.
 
 ## Panduan Penggunaan
 
-Setelah data berhasil dimuat, program menampilkan menu utama:
+Saat program dijalankan, pengguna diminta login terlebih dahulu. Akun yang berlaku tersimpan pada konstanta `DAFTAR_AKUN` di dalam program. Jika username atau password salah, program meminta input ulang sampai login berhasil.
+
+Setelah login berhasil dan data dimuat, program menampilkan menu utama:
 
 ```
 === MENU UTAMA ===
@@ -132,7 +134,7 @@ Setelah data berhasil dimuat, program menampilkan menu utama:
 - Format file: CSV dengan pemisah kolom titik koma (`;`) dan encoding UTF-8
 - Angka memakai titik sebagai pemisah ribuan dan koma sebagai pemisah desimal
 - Dataset bersumber dari data Cakupan Kepemilikan KTP-el Kabupaten/Kota Provinsi Sumatera Utara Tahun 2025 yang dipublikasikan Dinas PMD Dukcapil Provinsi Sumatera Utara, lalu dikonversi dari PDF ke CSV
-- Berisi 33 kabupaten/kota dan satu baris ringkasan provinsi (kode `12`)
+- Berisi enam kolom, 33 kabupaten/kota, dan satu baris ringkasan provinsi (kode `12`)
 
 Header wajib yang digunakan program:
 
@@ -143,7 +145,7 @@ Header wajib yang digunakan program:
 | `Jumlah Penduduk Wajib KTP` | Jumlah penduduk yang wajib memiliki KTP |
 | `Perekaman KTP-EL` | Jumlah penduduk yang sudah melakukan perekaman |
 
-Kolom lain pada dataset (jumlah penduduk ber-KTP, cakupan, persentase, dan kolom tambahan) tidak dipakai dalam perhitungan.
+Dua kolom lain pada dataset, yaitu `Jumlah Penduduk Ber-KTP` dan `Cakupan Kepemilikan KTP-EL (%)`, tidak dipakai dalam perhitungan.
 
 ## Keterbatasan
 
@@ -153,6 +155,7 @@ Kolom lain pada dataset (jumlah penduduk ber-KTP, cakupan, persentase, dan kolom
 4. Hasil hanya ditampilkan di terminal dalam bentuk tabel dan ringkasan. Program tidak membuat diagram Pareto dan tidak menyimpan hasil ke file keluaran.
 5. Program tidak menghitung FMEA, karena dataset tidak memuat penyebab kegagalan, dampak, maupun nilai risiko.
 6. Prioritas I dibatasi maksimal 10 wilayah dengan ambang kumulatif 80%.
+7. Login hanya berupa autentikasi sederhana dengan akun yang tertulis di dalam kode, sehingga tidak ditujukan sebagai pengamanan sungguhan.
 
 ## Stakeholder Pengembang
 
