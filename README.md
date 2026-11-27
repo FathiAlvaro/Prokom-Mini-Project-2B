@@ -1,50 +1,166 @@
 # Prokom-Mini-Project-2B
-# Alur Program
+# Analisis Prioritas Peningkatan Pelayanan Administrasi Kependudukan Berdasarkan Kesenjangan Kepemilikan KTP-el Menggunakan Metode Pareto
 
-## 1. Titik Masuk: main()
+Mini Project Pemrograman Komputer, Kelompok 2B, Laboratorium Sistem Informasi dan Keputusan, Departemen Teknik Industri, Fakultas Teknik, Universitas Andalas, 2026.
 
-Program berjalan dari blok if __name__ == "__main__" yang memanggil main(). Fungsi ini mencetak judul program, memanggil minta_data() untuk mendapatkan data, lalu memanggil hitung_pareto() sekali saja dan menyimpan hasilnya di variabel terurut. Setelah itu program masuk ke perulangan while True yang menampilkan menu utama, meminta pilihan lewat input_pilihan(), dan memanggil menu_1 sampai menu_4 sesuai pilihan. Perulangan ini tidak punya perintah keluar, sehingga menu muncul kembali setiap kali satu menu selesai ditampilkan.
+## Daftar Isi
 
-## 2. Pemuatan Data: minta_data()
+- [Latar Belakang](#latar-belakang)
+- [Tujuan](#tujuan)
+- [Fitur Utama](#fitur-utama)
+- [Metodologi](#metodologi)
+- [Struktur Repositori](#struktur-repositori)
+- [Syarat Minimal Software](#syarat-minimal-software)
+- [Cara Menjalankan Program](#cara-menjalankan-program)
+- [Panduan Penggunaan](#panduan-penggunaan)
+- [Format Data](#format-data)
+- [Keterbatasan](#keterbatasan)
+- [Stakeholder Pengembang](#stakeholder-pengembang)
 
-Fungsi ini memakai path bawaan dari konstanta NAMA_FILE dan memanggil muat_csv(path) di dalam perulangan. Jika muat_csv() mengembalikan data, fungsi langsung mengembalikannya ke main(). Jika yang dikembalikan adalah pesan error, pesan itu dicetak dan pengguna diminta mengetik path file CSV lain, lalu pemuatan diulang sampai berhasil.
+## Latar Belakang
 
-## 3. Pembacaan dan Validasi: muat_csv(path)
+KTP-el adalah identitas resmi penduduk yang menjadi dasar untuk memperoleh berbagai layanan publik, sehingga kepemilikannya perlu menjangkau seluruh penduduk di setiap wilayah. Cakupan kepemilikan KTP-el di Provinsi Sumatera Utara sudah tinggi, tetapi jumlah penduduk yang belum melakukan perekaman berbeda pada setiap kabupaten/kota. Pengurutan berdasarkan persentase cakupan saja belum cukup, karena wilayah dengan cakupan tinggi tetap dapat memiliki jumlah penduduk belum merekam yang besar bila penduduk wajib KTP-nya banyak. Karena itu program ini menghitung kesenjangan secara absolut, lalu memakai analisis Pareto (prinsip 80/20) untuk menentukan wilayah yang perlu diprioritaskan.
 
-File dibuka dengan encoding utf-8-sig dan dibaca memakai csv.reader dengan pemisah titik koma. Jika tidak ada baris sama sekali, fungsi mengembalikan error "File kosong". Baris pertama dianggap header, lalu setiap nama di KOLOM_WAJIB diperiksa keberadaannya. Posisi keempat kolom wajib disimpan sebagai indeks, dan indeks terbesar (terjauh) dipakai untuk memeriksa apakah sebuah baris punya cukup kolom.
+## Tujuan
 
-Baris data dibaca satu per satu mulai dari nomor baris 2. Baris yang kolomnya kurang dicatat ke error_log bila tidak kosong seluruhnya. Baris yang kode dan namanya sama-sama kosong dilewati. Angka wajib dan rekam dikonversi dengan baca_angka(); bila hasilnya None, baris dicatat ke error_log dan dilewati. Baris yang lolos dimasukkan ke dictionary w berisi kode, nama, wajib, rekam, kesenjangan, cakupan, kontribusi, kumulatif, dan prioritas.
+1. Mengetahui gambaran jumlah penduduk wajib KTP, jumlah perekaman KTP-el, dan kesenjangan perekaman pada setiap kabupaten/kota di Sumatera Utara.
+2. Membandingkan jumlah penduduk yang belum merekam antarkabupaten/kota.
+3. Mengetahui variasi kesenjangan melalui rata-rata, median, dan simpangan baku.
+4. Menentukan wilayah Prioritas I dan Prioritas II dengan analisis Pareto (ambang kumulatif 80% dan maksimal 10 wilayah pada Prioritas I).
+5. Membandingkan cakupan perekaman tiap kabupaten/kota dengan cakupan tingkat provinsi.
 
-Setelah dictionary dibuat, wilayah dengan wajib sama dengan 0 dicatat ke anomali_log lalu dikecualikan. Jika rekam lebih besar dari wajib, kejadian itu dicatat sebagai anomali. Kesenjangan dihitung dengan max(wajib - rekam, 0) dan cakupan dengan rekam dibagi wajib dikali 100. Kemudian kode wilayah diperiksa: jika sama dengan KODE_PROVINSI, dictionary disimpan sebagai provinsi; jika mengandung titik, ditambahkan ke daftar kabupaten/kota; selain itu dicatat sebagai error format kode.
+## Fitur Utama
 
-Setelah semua baris diproses, fungsi mengembalikan error bila daftar kabupaten/kota kosong. Cakupan provinsi diambil dari baris provinsi jika ada, atau dihitung dari jumlah rekam dibagi jumlah wajib seluruh kabupaten/kota. Hasil akhirnya berupa dictionary dengan kunci daftar, provinsi, cakupan_prov, error, dan anomali.
+| Fitur | Keterangan |
+|-------|-----------|
+| Pembacaan dan validasi CSV | Memeriksa file kosong, kolom wajib, kelengkapan kolom tiap baris, dan format angka |
+| Pencatatan error dan anomali | Baris bermasalah dicatat dalam log tanpa menghentikan program |
+| Menu 1: Audit Data & Kesenjangan | Jumlah wilayah valid, total wajib KTP, total perekaman, total kesenjangan, rata-rata, median, log, dan tabel kesenjangan per wilayah |
+| Menu 2: Statistik & Rasio Belum Rekam | Wilayah dengan kesenjangan tertinggi dan terendah, simpangan baku, dan rasio belum rekam per wilayah |
+| Menu 3: Perhitungan Pareto | Persentase kontribusi, persentase kumulatif, dan label prioritas setiap wilayah |
+| Menu 4: Prioritas I / II & Cakupan Provinsi | Daftar Prioritas I, Prioritas II, atau keduanya, serta perbandingan cakupan tiap wilayah dengan cakupan provinsi |
+| Validasi input menu | Pilihan di luar menu ditolak dan pengguna diminta memasukkan ulang |
+| Format angka Indonesia | Titik sebagai pemisah ribuan dan koma sebagai pemisah desimal |
 
-## 4. Fungsi Pembantu
+## Metodologi
 
-baca_angka() membersihkan teks angka: teks dipisah pada koma, ditolak (None) bila lebih dari dua bagian, titik ribuan dibuang, dan sisanya harus berupa digit. Bagian desimal hanya diterima jika semuanya nol, lalu hasilnya dikembalikan sebagai integer.
+### Penentuan Nilai
 
-format_angka() mengubah angka menjadi teks berformat Indonesia. Angka diformat dengan pemisah ribuan koma dan desimal titik, kemudian kedua tanda itu ditukar menjadi titik untuk ribuan dan koma untuk desimal.
+| Nilai | Cara Penentuan |
+|-------|---------------|
+| Wilayah analisis | Baris dengan kode wilayah yang mengandung titik (kabupaten/kota) |
+| Data pembanding | Baris dengan kode wilayah `12` (ringkasan Provinsi Sumatera Utara) |
+| Data dikecualikan | Wilayah dengan jumlah penduduk wajib KTP bernilai 0 |
+| Anomali | Perekaman lebih besar dari wajib KTP, kesenjangan dihitung 0 |
+| Cakupan provinsi | Diambil dari baris provinsi, atau dihitung dari total perekaman dibagi total wajib KTP seluruh kabupaten/kota bila baris provinsi tidak ada |
 
-input_pilihan() mencetak pesan, membaca input, dan mengulang tanpa henti sampai jawaban ada di daftar pilihan yang valid.
+### Perhitungan
 
-ambil_kesenjangan() dan ambil_cakupan() hanyalah fungsi kecil yang mengembalikan nilai kunci tertentu, dipakai sebagai key pada sorted(), max(), dan min().
+```
+Kesenjangan        = max(Wajib KTP - Perekaman, 0)
+% Cakupan          = Perekaman / Wajib KTP x 100
+% Kontribusi       = Kesenjangan wilayah / Total kesenjangan x 100
+% Kumulatif        = Jumlah berjalan % kontribusi (urut kesenjangan terbesar)
+Rasio Belum Rekam  = 100 - % Cakupan
+```
 
-## 5. Perhitungan Pareto: hitung_pareto(daftar)
+### Penentuan Prioritas
 
-Daftar diurutkan dari kesenjangan terbesar dan total kesenjangan dijumlahkan. Pada setiap wilayah, program menyimpan nilai kumulatif sebelumnya, menghitung kontribusi (kesenjangan dibagi total dikali 100), lalu menambahkannya ke kumulatif. Wilayah mendapat label "Prioritas I" bila kumulatif sebelumnya masih di bawah AMBANG_PARETO dan nomor urutnya tidak melebihi BATAS_PRIORITAS_1; selain itu mendapat "Prioritas II". Karena isi daftar berupa dictionary yang sama dengan data["daftar"], nilai kontribusi, kumulatif, dan prioritas otomatis ikut tersimpan di data utama.
+Wilayah diurutkan dari kesenjangan terbesar ke terkecil. Sebuah wilayah masuk **Prioritas I** apabila persentase kumulatif wilayah sebelumnya masih di bawah 80% dan urutannya tidak lebih dari 10. Wilayah lainnya masuk **Prioritas II**.
 
-## 6. Menu 1: Audit Data
+### Statistik
 
-menu_1() mencetak jumlah wilayah valid, total wajib, total rekam, total kesenjangan, serta rata-rata dan median kesenjangan memakai modul statistics. Setelah itu log error dan log anomali dicetak, atau diberi keterangan "tidak ada" bila kosong. Bagian terakhir adalah tabel wilayah yang diurutkan dari kesenjangan terbesar.
+Rata-rata dan median dihitung dengan `statistics.mean` dan `statistics.median`, sedangkan simpangan baku populasi dengan `statistics.pstdev`.
 
-## 7. Menu 2: Statistik
+## Struktur Repositori
 
-menu_2() mencari wilayah dengan kesenjangan tertinggi memakai max() dan terendah memakai min(), menghitung simpangan baku dengan statistics.pstdev(), lalu mencetak tabel belum rekam per wilayah beserta rasionya, yaitu 100 dikurangi cakupan.
+```
+.
+├── data/
+│   └── cakupan-ktp-el-sumut-kab-kota-2025.csv
+├── dokumentasi/
+│   └── MINI_PROJECT.docx
+├── program/
+│   └── mini_project_2B.py
+└── README.md
+```
 
-## 8. Menu 3: Pareto
+| Folder / File | Isi |
+|---------------|-----|
+| `data/` | Dataset CSV cakupan KTP-el kabupaten/kota Sumatera Utara 2025 |
+| `dokumentasi/` | Laporan mini project |
+| `program/` | Kode program Python |
+| `README.md` | Dokumen ini |
 
-menu_3() menerima daftar terurut dari main(), menghitung jumlah wilayah Prioritas I dan Prioritas II, lalu memanggil cetak_pareto() untuk menampilkan tabel kesenjangan, persen kontribusi, persen kumulatif, dan prioritas.
+## Syarat Minimal Software
 
-## 9. Menu 4: Prioritas dan Cakupan Provinsi
+- Python 3.6 atau lebih baru
+- Hanya memakai pustaka standar (`csv` dan `statistics`), sehingga tidak perlu instalasi paket tambahan
+- Terminal atau command prompt
 
-menu_4() meminta pengguna memilih Prioritas I, Prioritas II, atau keduanya, lalu memanggil cetak_pareto() pada daftar yang sudah difilter. Setelah itu program menampilkan tabel cakupan setiap wilayah yang diurutkan dari cakupan terkecil, lengkap dengan status "Di bawah rata-rata" atau "Di atas/sama" dibandingkan cakupan provinsi.
+## Cara Menjalankan Program
+
+1. Unduh atau clone repositori ini.
+2. Pastikan file `cakupan-ktp-el-sumut-kab-kota-2025.csv` berada satu folder dengan `mini_project_2B.py`, atau siapkan path file tersebut.
+3. Buka terminal pada folder program, lalu jalankan:
+
+   ```bash
+   python mini_project_2B.py
+   ```
+
+4. Jika file CSV tidak ditemukan atau isinya tidak valid, program menampilkan pesan error dan meminta path file CSV lain.
+
+## Panduan Penggunaan
+
+Setelah data berhasil dimuat, program menampilkan menu utama:
+
+```
+=== MENU UTAMA ===
+[1] Audit Data & Kesenjangan
+[2] Statistik & Rasio Belum Rekam
+[3] Perhitungan Pareto
+[4] Prioritas I / II & Cakupan Provinsi
+```
+
+1. Ketik angka 1 sampai 4 lalu tekan Enter.
+2. Pada menu 4, program menanyakan tampilan yang diinginkan: `1` untuk Prioritas I, `2` untuk Prioritas II, atau `3` untuk keduanya.
+3. Jika memasukkan pilihan yang tidak valid, program menampilkan pesan input salah dan meminta pilihan ulang.
+4. Setelah satu menu selesai, menu utama muncul kembali. Untuk keluar, hentikan program dengan `Ctrl + C`.
+
+## Format Data
+
+- Format file: CSV dengan pemisah kolom titik koma (`;`) dan encoding UTF-8
+- Angka memakai titik sebagai pemisah ribuan dan koma sebagai pemisah desimal
+- Dataset bersumber dari data Cakupan Kepemilikan KTP-el Kabupaten/Kota Provinsi Sumatera Utara Tahun 2025 yang dipublikasikan Dinas PMD Dukcapil Provinsi Sumatera Utara, lalu dikonversi dari PDF ke CSV
+- Berisi 33 kabupaten/kota dan satu baris ringkasan provinsi (kode `12`)
+
+Header wajib yang digunakan program:
+
+| Kolom | Keterangan |
+|-------|-----------|
+| `Kode Wilayah` | Kode administratif wilayah |
+| `Kabupaten/Kota` | Nama wilayah |
+| `Jumlah Penduduk Wajib KTP` | Jumlah penduduk yang wajib memiliki KTP |
+| `Perekaman KTP-EL` | Jumlah penduduk yang sudah melakukan perekaman |
+
+Kolom lain pada dataset (jumlah penduduk ber-KTP, cakupan, persentase, dan kolom tambahan) tidak dipakai dalam perhitungan.
+
+## Keterbatasan
+
+1. Data hanya berasal dari satu file CSV, yaitu data kabupaten/kota Sumatera Utara tahun 2025.
+2. Analisis dibatasi pada kesenjangan perekaman KTP-el, yaitu selisih jumlah penduduk wajib KTP dan jumlah penduduk yang telah merekam.
+3. Program tidak menghitung jumlah penduduk yang belum memiliki KTP-el secara langsung, karena hanya memakai data perekaman, bukan data kepemilikan.
+4. Hasil hanya ditampilkan di terminal dalam bentuk tabel dan ringkasan. Program tidak membuat diagram Pareto dan tidak menyimpan hasil ke file keluaran.
+5. Program tidak menghitung FMEA, karena dataset tidak memuat penyebab kegagalan, dampak, maupun nilai risiko.
+6. Prioritas I dibatasi maksimal 10 wilayah dengan ambang kumulatif 80%.
+
+## Stakeholder Pengembang
+
+**Anggota Kelompok 2B**
+
+| Nama | NIM |
+|------|-----|
+| Dea Permata Aldosi | 2610931034 |
+| Fathi Alvaro Wiraja | 2610932029 |
+| Andara Nurul Fatimah | 2610932045 |
+| Melsa Sigianto Putri | 2610933019 |
